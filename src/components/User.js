@@ -9,7 +9,7 @@ const User = ({ username, onClick }) => {
   return (
       
     <li onClick={onClick} key={uuid}>
-      {(first, last, title)}
+     {title} {first} {last}
     </li>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import Spinner from "./components/UI/Spinner/Spinner";
 import User from "./components/User";
@@ -8,6 +8,12 @@ import "./App.css";
 
 function App() {
   const [users, setUsers] = useState();
+  const [singleUser, setSingleUser] = useState();
+  const [showFirstUser, setShowFirstUser] = useState({
+    show: false,
+    data: null,
+  });
+  const [showUser, setShowUser] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [hasError, setError] = useState(false);
 
@@ -22,8 +28,10 @@ function App() {
       if (response.status !== 500) {
         const data = await response.json();
         const userResults = data.results;
-        console.log(userResults);
+
         setUsers(userResults);
+        setShowFirstUser({ show: true, data: userResults[0] });
+        setShowUser(false);
       }
     } catch (error) {
       setError(error);
@@ -32,32 +40,29 @@ function App() {
     }
   };
 
-  // const showUserInfo = (id) => {
-  //   users.map((user) => {
-  //     if (id === user.id.value) {
-  //       return <UserInfo userInfo={user} />;
-  //     }
-  //   });
-  // };
+  const getUser = (user) => {
+    setSingleUser(user);
+    setShowUser(true);
+    setShowFirstUser({ show: false });
+  };
+
   const isUsersReady = users !== undefined;
 
   return (
     <div className="App">
       <Button onSubmit={getUsers} />
-      {isLoading && <Spinner />}
-      {hasError && <p> Something went wrong! </p>}
-      {isUsersReady &&
-        users.map((user, index) => {
-          return (
-            <>
-              <User
-                key={user.login.uuid}
-                username={user}
-              />
-              {index !== user.login.uuid ?<UserInfo userInfo={user}/> : null}
-            </>
-          );
-        })}
+      <div className="Card">
+        {isLoading && <Spinner />}
+        {hasError && <p> Something went wrong! </p>}
+        {!hasError &&
+          !isLoading &&
+          isUsersReady &&
+          users.map((user) => {
+            return <User onClick={() => getUser(user)} username={user} />;
+          })}
+        {showFirstUser.show && <UserInfo userInfo={showFirstUser.data} />}
+        {showUser && <UserInfo userInfo={singleUser} />}
+      </div>
     </div>
   );
 }
