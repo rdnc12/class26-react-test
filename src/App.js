@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 import Spinner from "./components/UI/Spinner/Spinner";
 import User from "./components/User";
@@ -8,21 +8,22 @@ import "./App.css";
 
 function App() {
   const [users, setUsers] = useState();
-  const [singleUser, setSingleUser] = useState();
+  const [selectedUser, setSelectedUser] = useState({
+    show: false,
+    data: null,
+  });
   const [showFirstUser, setShowFirstUser] = useState({
     show: false,
     data: null,
   });
-  const [showUser, setShowUser] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [hasError, setError] = useState(false);
-
-  const URL = "https://randomuser.me/api/?results=5";
 
   const getUsers = async () => {
     try {
       setLoading(true);
 
+      const URL = "https://randomuser.me/api/?results=5";
       const response = await fetch(URL);
 
       if (response.status !== 500) {
@@ -31,7 +32,7 @@ function App() {
 
         setUsers(userResults);
         setShowFirstUser({ show: true, data: userResults[0] });
-        setShowUser(false);
+        setSelectedUser({ show: false, data: null });
       }
     } catch (error) {
       setError(error);
@@ -41,16 +42,15 @@ function App() {
   };
 
   const getUser = (user) => {
-    setSingleUser(user);
-    setShowUser(true);
-    setShowFirstUser({ show: false });
+    setSelectedUser({ show: true, data: user });
+    setShowFirstUser({ show: false, data: null });
   };
 
   const isUsersReady = users !== undefined;
 
   return (
     <div className="App">
-      <Button onSubmit={getUsers} />
+      <Button onClick={getUsers} />
       <div className="Card">
         {isLoading && <Spinner />}
         {hasError && <p> Something went wrong! </p>}
@@ -58,10 +58,20 @@ function App() {
           !isLoading &&
           isUsersReady &&
           users.map((user) => {
-            return <User onClick={() => getUser(user)} username={user} />;
+            return (
+              <User
+                key={user.login.uuid}
+                onClick={() => getUser(user)}
+                username={user}
+              />
+            );
           })}
-        {showFirstUser.show && <UserInfo userInfo={showFirstUser.data} />}
-        {showUser && <UserInfo userInfo={singleUser} />}
+        {!hasError && !isLoading && showFirstUser.show && (
+          <UserInfo userInfo={showFirstUser.data} />
+        )}
+        {!hasError && !isLoading && selectedUser.show && (
+          <UserInfo userInfo={selectedUser.data} />
+        )}
       </div>
     </div>
   );

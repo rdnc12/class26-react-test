@@ -2,7 +2,6 @@ import React from "react";
 
 const UserInfo = ({ userInfo }) => {
   const {
-    login: { uuid },
     picture: { medium },
     cell,
     email,
@@ -11,10 +10,10 @@ const UserInfo = ({ userInfo }) => {
   } = userInfo;
 
   return (
-    <div key={uuid}>
+    <div >
       <img src={medium} alt="pic" />
       <h4>
-        {first}
+        {first} 
         {last}
       </h4>
       <p>{email}</p>

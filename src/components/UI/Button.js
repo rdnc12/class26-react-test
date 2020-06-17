@@ -1,8 +1,8 @@
 import React from 'react';
 
-  const Button=({ onSubmit }) => {
+  const Button=({ onClick }) => {
   return (
-    <button  onClick={onSubmit} type="submit"
+    <button  onClick={onClick}
     className="getButton">
      Get Users !
     </button>
